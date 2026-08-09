@@ -26,10 +26,12 @@ import { AuthScreen } from './components/auth/AuthScreen';
 
 import { User } from './types';
 import { authService } from './services/auth';
+import { db } from './services/db';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(authService.getCurrentUser());
   const [currentView, setCurrentView] = useState<string>('dashboard');
+  const [, setDbTick] = useState(0);
 
   // Sidebar responsive states
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -43,10 +45,16 @@ export default function App() {
   const [openInitialTaskModal, setOpenInitialTaskModal] = useState(false);
 
   useEffect(() => {
-    const unsub = authService.subscribe((user) => {
+    const unsubAuth = authService.subscribe((user) => {
       setCurrentUser(user);
     });
-    return () => unsub();
+    const unsubDb = db.subscribe(() => {
+      setDbTick((prev) => prev + 1);
+    });
+    return () => {
+      unsubAuth();
+      unsubDb();
+    };
   }, []);
 
   // Anti-Copy and Security Handlers

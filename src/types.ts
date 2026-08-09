@@ -8,6 +8,7 @@ export interface Team {
   managerName?: string;
   teamLeadId?: string;
   teamLeadName?: string;
+  teamLeadAvatar?: string;
   memberIds: string[];
   description?: string;
   createdAt: string;
@@ -211,5 +212,5 @@ export interface NotificationItem {
   message: string;
   timestamp: string;
   read: boolean;
-  type: 'leave' | 'survey' | 'shoutout' | 'review' | 'task' | 'system';
+  type: 'leave' | 'survey' | 'shoutout' | 'review' | 'task' | 'system' | 'info';
 }

@@ -38,6 +38,11 @@ export const TeamsView: React.FC<TeamsViewProps> = ({ currentUser }) => {
     setUsers([...db.getUsers()]);
   };
 
+  React.useEffect(() => {
+    const unsub = db.subscribe(() => refreshData());
+    return () => unsub();
+  }, []);
+
   const departments = ['All', 'Engineering', 'Product & Design', 'People Operations', 'Marketing', 'Executive'];
 
   const filteredTeams = teams.filter((t) => {
@@ -86,13 +91,14 @@ export const TeamsView: React.FC<TeamsViewProps> = ({ currentUser }) => {
     if (!canManage || !teamName.trim() || !department) return;
 
     db.saveTeam({
-      id: editingTeam ? editingTeam.id : undefined,
+      id: editingTeam ? editingTeam.id : `team-${Date.now()}`,
       name: teamName.trim(),
       department,
       managerId: managerId || currentUser.id,
       teamLeadId: teamLeadId || undefined,
       memberIds: selectedMemberIds,
-      description: description.trim()
+      description: description.trim(),
+      createdAt: editingTeam ? editingTeam.createdAt : new Date().toISOString().split('T')[0]
     });
 
     refreshData();

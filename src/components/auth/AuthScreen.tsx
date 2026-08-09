@@ -81,10 +81,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
       setSignInError('Please enter your account email address.');
       return;
     }
+    if (!signInPassword.trim()) {
+      setSignInError('Please enter your account password.');
+      return;
+    }
 
-    const user = authService.login(signInEmail.trim(), signInPassword.trim(), signInRole);
-    if (!user) {
-      setSignInError('Authentication failed. Your email, password, and selected job role must match your registered account saved in the database.');
+    const res = authService.login(signInEmail.trim(), signInPassword.trim(), signInRole);
+    if (!res.success) {
+      setSignInError(res.error || 'Authentication failed. Please verify your credentials and selected role.');
       return;
     }
 

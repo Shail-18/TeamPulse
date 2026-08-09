@@ -12,6 +12,7 @@ import { Badge } from '../common/Badge';
 import { Modal } from '../common/Modal';
 import { db } from '../../services/db';
 import { canEditLeaveRequest, canViewLeaveRequest } from '../../utils/permissions';
+import { ManagerAnalyticsDashboard } from '../analytics/ManagerAnalyticsDashboard';
 
 interface ManagerDashboardProps {
   currentUser: User;
@@ -263,6 +264,9 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Visual Analytics Dashboard (Monthly Leave Trends & Pulse Survey Sentiment) */}
+      <ManagerAnalyticsDashboard currentUser={currentUser} />
 
       {/* Direct Reports Table */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">

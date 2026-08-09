@@ -841,6 +841,27 @@ class LocalDatabase {
     this.notify();
     deleteTaskFromFirestore(taskId).catch((err) => console.error(err));
   }
+
+  public resetToDefaults(): void {
+    try {
+      localStorage.removeItem('teampulse_purge_user_data_v2');
+      localStorage.removeItem('teampulse_users');
+      localStorage.removeItem('teampulse_teams');
+      localStorage.removeItem('teampulse_surveys');
+      localStorage.removeItem('teampulse_responses');
+      localStorage.removeItem('teampulse_leaves');
+      localStorage.removeItem('teampulse_shoutouts');
+      localStorage.removeItem('teampulse_reviews');
+      localStorage.removeItem('teampulse_metrics');
+      localStorage.removeItem('teampulse_notifs');
+      localStorage.removeItem('teampulse_tasks');
+      localStorage.removeItem('teampulse_skill_catalog');
+      this.init();
+      this.notify();
+    } catch (e) {
+      console.error('Reset to defaults error:', e);
+    }
+  }
 }
 
 export const db = new LocalDatabase();

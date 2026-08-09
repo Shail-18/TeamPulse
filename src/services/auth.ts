@@ -9,6 +9,15 @@ class AuthService {
 
   constructor() {
     this.init();
+    db.subscribe(() => {
+      if (this.currentUser) {
+        const freshUser = db.getUserById(this.currentUser.id);
+        if (freshUser && JSON.stringify(freshUser) !== JSON.stringify(this.currentUser)) {
+          this.currentUser = freshUser;
+          this.notify();
+        }
+      }
+    });
   }
 
   private init() {
@@ -54,28 +63,54 @@ class AuthService {
     }
   }
 
-  public login(email: string, password?: string, role?: UserRole): User | null {
+  public login(email: string, password?: string, role?: UserRole): { success: boolean; user?: User; error?: string } {
     const users = db.getUsers();
     const cleanEmail = email.trim().toLowerCase();
     const found = users.find((u) => u.email && u.email.trim().toLowerCase() === cleanEmail);
 
-    if (found) {
-      // Validate password if user has password saved in database
-      if (found.password && password && password.trim()) {
-        if (found.password.trim() !== password.trim()) {
-          return null; // Password mismatch
-        }
-      }
-      // Validate job role matches saved database role
-      if (role && found.role !== role) {
-        return null; // Role mismatch
-      }
-      this.currentUser = found;
-      localStorage.setItem('teampulse_current_user_id', found.id);
-      this.notify();
-      return found;
+    if (!cleanEmail) {
+      return { success: false, error: 'Please enter your account email address.' };
     }
-    return null;
+
+    if (!found) {
+      return { 
+        success: false, 
+        error: 'No registered account found with this email address. Please sign up for an account.' 
+      };
+    }
+
+    if (!password || !password.trim()) {
+      return { 
+        success: false, 
+        error: 'Password is required to sign in.' 
+      };
+    }
+
+    if (found.password && found.password.trim() !== password.trim()) {
+      return { 
+        success: false, 
+        error: 'Incorrect password entered. Please enter your correct account password.' 
+      };
+    }
+
+    if (!role) {
+      return {
+        success: false,
+        error: 'Please select your registered job role to access your dashboard.'
+      };
+    }
+
+    if (found.role !== role) {
+      return { 
+        success: false, 
+        error: `Security Access Denied: This account is registered under the role '${found.role}', not '${role}'. Please select '${found.role}' as your role to get access.` 
+      };
+    }
+
+    this.currentUser = found;
+    localStorage.setItem('teampulse_current_user_id', found.id);
+    this.notify();
+    return { success: true, user: found };
   }
 
   public signup(userData: Omit<User, 'id'>): User {

@@ -19,6 +19,28 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser }) => {
   const [newSkillInput, setNewSkillInput] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  React.useEffect(() => {
+    setName(currentUser.name);
+    setEmail(currentUser.email);
+    setPhone(currentUser.phone || '');
+    setLocation(currentUser.location || '');
+    setSkills(currentUser.skills || []);
+  }, [currentUser]);
+
+  React.useEffect(() => {
+    const unsub = db.subscribe(() => {
+      const fresh = db.getUserById(currentUser.id);
+      if (fresh) {
+        setName(fresh.name);
+        setEmail(fresh.email);
+        setPhone(fresh.phone || '');
+        setLocation(fresh.location || '');
+        setSkills(fresh.skills || []);
+      }
+    });
+    return () => unsub();
+  }, [currentUser.id]);
+
   const isAdminOrHr = currentUser.role === 'HR';
   const skillCatalog = db.getSkillCatalog();
 

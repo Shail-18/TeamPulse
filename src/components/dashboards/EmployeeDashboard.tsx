@@ -21,6 +21,13 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
   onOpenLeaveModal,
   onOpenShoutoutModal
 }) => {
+  const [, setTick] = useState(0);
+
+  React.useEffect(() => {
+    const unsub = db.subscribe(() => setTick((t) => t + 1));
+    return () => unsub();
+  }, []);
+
   const activeSurveys = db.getSurveys().filter((s) => s.status === 'active');
   const myLeaves = db.getLeaves().filter((l) => l.userId === currentUser.id);
   const myShoutouts = db.getShoutouts().filter((s) => s.toUserId === currentUser.id || s.fromUserId === currentUser.id);

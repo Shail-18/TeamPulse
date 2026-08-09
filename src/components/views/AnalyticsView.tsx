@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
-  PieChart, BarChart2, TrendingUp, Users, Heart, ShieldAlert, Download
+  PieChart, BarChart2, TrendingUp, Users, Heart, ShieldAlert, Download, Calendar, Activity
 } from 'lucide-react';
 import { 
   ResponsiveContainer, PieChart as RePieChart, Pie, Cell, Tooltip, 
@@ -10,12 +10,21 @@ import { User as UserType } from '../../types';
 import { StatCard } from '../common/StatCard';
 import { Badge } from '../common/Badge';
 import { db } from '../../services/db';
+import { ManagerAnalyticsDashboard } from '../analytics/ManagerAnalyticsDashboard';
 
 interface AnalyticsViewProps {
   currentUser: UserType;
 }
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ currentUser }) => {
+  const [activeTab, setActiveTab] = useState<'manager_trends' | 'executive_summary'>('manager_trends');
+  const [, setTick] = useState(0);
+
+  React.useEffect(() => {
+    const unsub = db.subscribe(() => setTick((t) => t + 1));
+    return () => unsub();
+  }, []);
+
   const metrics = db.getMetrics();
 
   const enpsTrendData = [
@@ -144,7 +153,35 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ currentUser }) => 
         </div>
       </div>
 
-      {/* Top Metrics */}
+      {/* Analytics View Selector Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+        <button
+          onClick={() => setActiveTab('manager_trends')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
+            activeTab === 'manager_trends'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+              : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          <Calendar className="w-4 h-4" /> Manager Leave & Sentiment Dashboard
+        </button>
+        <button
+          onClick={() => setActiveTab('executive_summary')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
+            activeTab === 'executive_summary'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+              : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+          }`}
+        >
+          <Activity className="w-4 h-4" /> Executive Org Metrics & eNPS
+        </button>
+      </div>
+
+      {activeTab === 'manager_trends' ? (
+        <ManagerAnalyticsDashboard currentUser={currentUser} />
+      ) : (
+        <>
+          {/* Top Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Company eNPS Benchmark"
@@ -238,6 +275,8 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ currentUser }) => 
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };
