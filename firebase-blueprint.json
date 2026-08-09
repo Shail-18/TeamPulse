@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "Team member profile information and status",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID" },
+        "name": { "type": "string", "description": "Full name" },
+        "email": { "type": "string", "description": "Email address" },
+        "role": { "type": "string", "description": "Role (Employee, Team Lead, Manager, Admin)" },
+        "title": { "type": "string", "description": "Job title" },
+        "department": { "type": "string", "description": "Department name" },
+        "avatar": { "type": "string", "description": "Avatar image URL" },
+        "password": { "type": "string", "description": "User password for sign in" },
+        "status": { "type": "string", "description": "Availability status (Available, In a Meeting, Away)" }
+      },
+      "required": ["id", "name", "email", "role"]
+    },
+    "tasks": {
+      "title": "Task Item",
+      "description": "Tasks assigned to team members",
+      "properties": {
+        "id": { "type": "string", "description": "Unique task ID" },
+        "title": { "type": "string", "description": "Task title" },
+        "description": { "type": "string", "description": "Detailed description" },
+        "assigneeId": { "type": "string", "description": "User ID of assignee" },
+        "status": { "type": "string", "description": "Task status (To Do, In Progress, Review, Completed)" },
+        "priority": { "type": "string", "description": "Task priority (Low, Medium, High, Urgent)" },
+        "dueDate": { "type": "string", "description": "Due date ISO string" }
+      },
+      "required": ["id", "title", "status"]
+    },
+    "reviews": {
+      "title": "Performance Review",
+      "description": "Employee performance evaluations and OKRs",
+      "properties": {
+        "id": { "type": "string", "description": "Review ID" },
+        "employeeId": { "type": "string", "description": "Target employee ID" },
+        "reviewerId": { "type": "string", "description": "Reviewer ID" },
+        "period": { "type": "string", "description": "Review period (e.g., H2 2026)" },
+        "overallScore": { "type": "number", "description": "Overall score rating" },
+        "status": { "type": "string", "description": "Review status" }
+      },
+      "required": ["id", "employeeId", "overallScore"]
+    }
+  }
+}
