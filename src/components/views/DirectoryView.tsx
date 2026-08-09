@@ -104,8 +104,31 @@ export const DirectoryView: React.FC<DirectoryViewProps> = ({ currentUser }) => 
 
     if (!matchesSearch || !matchesDept || !matchesRole) return false;
 
+    // Role-based directory visibility:
+    // HR does not see HR (sees Manager, Team Lead, Employee)
+    // Manager does not see Manager or HR (sees Team Lead, Employee)
+    // Team Lead does not see Team Lead, Manager, or HR (sees Employee)
+    // Employee does not see Employee (sees Team Lead, Manager, HR)
+    let matchesRoleVisibility = true;
+    if (currentUser.role === 'HR') {
+      matchesRoleVisibility = u.role !== 'HR';
+    } else if (currentUser.role === 'Manager') {
+      matchesRoleVisibility = u.role === 'Team Lead' || u.role === 'Employee';
+    } else if (currentUser.role === 'Team Lead') {
+      matchesRoleVisibility = u.role === 'Employee';
+    } else if (currentUser.role === 'Employee') {
+      matchesRoleVisibility = u.role !== 'Employee';
+    }
+
+    if (!matchesRoleVisibility) return false;
+
     if (activeTab === 'unassigned') {
-      return u.role === 'Employee' && (!u.managerId || u.managerId === '' || u.department === 'Unassigned');
+      const isUnassigned = (!u.team || u.team === '' || u.team.toLowerCase() === 'unassigned' || !u.managerId || u.managerId === '');
+      if (!isUnassigned) return false;
+      if (currentUser.role === 'HR') return u.role !== 'HR';
+      if (currentUser.role === 'Manager') return u.role === 'Team Lead' || u.role === 'Employee';
+      if (currentUser.role === 'Team Lead') return u.role === 'Employee';
+      return u.role !== 'Employee';
     }
     if (activeTab === 'directReports') {
       return u.managerId === currentUser.id || u.department === currentUser.department;

@@ -31,7 +31,7 @@ export const TeamsView: React.FC<TeamsViewProps> = ({ currentUser }) => {
   const [description, setDescription] = useState('');
   const [memberSearch, setMemberSearch] = useState('');
 
-  const canManage = currentUser.role === 'Manager' || currentUser.role === 'HR';
+  const canManage = currentUser.role === 'HR' || currentUser.role === 'Manager' || currentUser.role === 'Team Lead';
 
   const refreshData = () => {
     setTeams([...db.getTeams()]);
@@ -44,6 +44,42 @@ export const TeamsView: React.FC<TeamsViewProps> = ({ currentUser }) => {
   }, []);
 
   const departments = ['All', 'Engineering', 'Product & Design', 'People Operations', 'Marketing', 'Executive'];
+
+  // Role-based visibility rule:
+  // HR shows Manager, Team Lead, Employee (NO HR)
+  // Manager shows Team Lead, Employee (NO Manager)
+  // Team Lead shows Employee (NO Team Lead)
+  // Employee shows higher roles (NO Employee)
+  const isUserSelectableByCurrentRole = (targetUser: User) => {
+    if (currentUser.role === 'HR') {
+      return targetUser.role !== 'HR'; // HR can select Manager, Team Lead, Employee
+    }
+    if (currentUser.role === 'Manager') {
+      return targetUser.role === 'Team Lead' || targetUser.role === 'Employee';
+    }
+    if (currentUser.role === 'Team Lead') {
+      return targetUser.role === 'Employee';
+    }
+    if (currentUser.role === 'Employee') {
+      return targetUser.role !== 'Employee';
+    }
+    return false;
+  };
+
+  // Unassigned / Newly joined members eligible for assignment by current user
+  const unassignedMembers = users.filter((u) => {
+    const isUnassigned = !u.team || u.team === '' || u.team.toLowerCase() === 'unassigned' || !teams.some(t => t.name === u.team || t.memberIds?.includes(u.id));
+    return isUnassigned && isUserSelectableByCurrentRole(u);
+  });
+
+  const [quickAssignTeams, setQuickAssignTeams] = useState<{ [userId: string]: string }>({});
+
+  const handleQuickAssign = (userId: string) => {
+    const targetTeam = quickAssignTeams[userId] || (teams[0]?.name || '');
+    if (!targetTeam) return;
+    db.assignEmployeeToTeam(userId, targetTeam);
+    refreshData();
+  };
 
   const filteredTeams = teams.filter((t) => {
     const matchesSearch = t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,12 +147,16 @@ export const TeamsView: React.FC<TeamsViewProps> = ({ currentUser }) => {
     refreshData();
   };
 
-  // Filter available candidates for members selection
+  // Filter available candidates for members selection according to role rules:
+  // HR -> Managers, Team Leads, Employees
+  // Manager -> Team Leads, Employees
+  // Team Lead -> Employees
   const eligibleMembers = users.filter((u) => {
+    const isRoleMatch = isUserSelectableByCurrentRole(u);
     const searchMatch = u.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
                         u.email.toLowerCase().includes(memberSearch.toLowerCase()) ||
                         u.title.toLowerCase().includes(memberSearch.toLowerCase());
-    return searchMatch;
+    return isRoleMatch && searchMatch;
   });
 
   return (
@@ -141,6 +181,60 @@ export const TeamsView: React.FC<TeamsViewProps> = ({ currentUser }) => {
           </button>
         )}
       </div>
+
+      {/* Newly Joined / Unassigned Staff Quick-Assign Section */}
+      {unassignedMembers.length > 0 && canManage && (
+        <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-indigo-50/60 rounded-2xl p-4 border border-amber-200/80 shadow-xs">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-amber-600" />
+              <div>
+                <h3 className="text-sm font-bold text-amber-950">
+                  Newly Joined / Unassigned Staff ({unassignedMembers.length})
+                </h3>
+                <p className="text-[11px] text-amber-800">
+                  {currentUser.role === 'HR' && 'Assign newly joined managers, team leads, or employees directly into teams.'}
+                  {currentUser.role === 'Manager' && 'Assign newly joined team leads or employees directly into teams.'}
+                  {currentUser.role === 'Team Lead' && 'Assign newly joined employees directly into your team.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {unassignedMembers.map((member) => (
+              <div key={member.id} className="bg-white rounded-xl p-3 border border-amber-200/60 shadow-xs flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-900 truncate">{member.name}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{member.role} • {member.department}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <select
+                    value={quickAssignTeams[member.id] || teams[0]?.name || ''}
+                    onChange={(e) => setQuickAssignTeams({ ...quickAssignTeams, [member.id]: e.target.value })}
+                    className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-medium text-slate-700"
+                  >
+                    {teams.map((t) => (
+                      <option key={t.id} value={t.name}>{t.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => handleQuickAssign(member.id)}
+                    className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white font-bold text-[11px] rounded-lg shadow-xs transition-colors"
+                    title="Assign to Team"
+                  >
+                    Assign
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
@@ -366,7 +460,12 @@ export const TeamsView: React.FC<TeamsViewProps> = ({ currentUser }) => {
               className="w-full px-3 py-2 border border-amber-300 rounded-xl text-xs bg-white text-slate-800 font-medium"
             >
               <option value="">-- Choose Team Lead --</option>
-              {users.map((u) => {
+              {users.filter(u => {
+                if (currentUser.role === 'HR') return true;
+                if (currentUser.role === 'Manager') return u.role === 'Team Lead' || u.role === 'Employee';
+                if (currentUser.role === 'Team Lead') return u.role === 'Team Lead' || u.id === currentUser.id;
+                return true;
+              }).map((u) => {
                 const existingLedTeam = teams.find((t) => t.teamLeadId === u.id && t.id !== editingTeam?.id);
                 return (
                   <option key={u.id} value={u.id}>
