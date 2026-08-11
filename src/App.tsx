@@ -22,7 +22,7 @@ import { SettingsView } from './components/views/SettingsView';
 import { TeamsView } from './components/views/TeamsView';
 
 import { QuickSearchModal } from './components/common/QuickSearchModal';
-import { AuthScreen } from './components/auth/AuthScreen';
+import { LandingPage } from './components/auth/LandingPage';
 
 import { User } from './types';
 import { authService } from './services/auth';
@@ -98,7 +98,7 @@ export default function App() {
   }, []);
 
   if (!currentUser) {
-    return <AuthScreen onSuccess={() => setCurrentView('dashboard')} />;
+    return <LandingPage onSuccess={() => setCurrentView('dashboard')} />;
   }
 
   const renderDashboardByRole = () => {
