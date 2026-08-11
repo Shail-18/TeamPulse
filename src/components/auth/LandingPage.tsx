@@ -154,8 +154,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSuccess }) => {
           <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
             <a href="#features" className="hover:text-indigo-600 transition-colors">Features</a>
             <a href="#roles" className="hover:text-indigo-600 transition-colors">Role Portals</a>
-            <a href="#analytics" className="hover:text-indigo-600 transition-colors">Pulse Analytics</a>
-            <a href="#testimonials" className="hover:text-indigo-600 transition-colors">Testimonials</a>
+            <a href="#about" className="hover:text-indigo-600 transition-colors">About</a>
+            <a href="#contact" className="hover:text-indigo-600 transition-colors">Contact</a>
           </nav>
 
           {/* Auth Actions */}
@@ -411,7 +411,109 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSuccess }) => {
         </div>
       </section>
 
-      {/* 6. Footer */}
+      {/* 6. About Section */}
+      <section id="about" className="py-16 bg-white border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[11px] font-extrabold rounded-full border border-indigo-200 uppercase">
+              About TeamPulse
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              Empowering Human-Centric Organisations
+            </h2>
+            <p className="text-xs sm:text-sm font-medium text-slate-600 leading-relaxed">
+              TeamPulse was engineered to bridge the gap between high-level People Operations, department leadership, sprint leads, and individual employees. We believe that transparent role-based visibility and continuous feedback foster thriving workplace cultures.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+            <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+              <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center font-extrabold text-sm">
+                01
+              </div>
+              <h3 className="text-base font-bold text-slate-900">Clear Boundaries</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Role-tailored interfaces ensure every team member accesses exact data essential to their scope without operational friction or information overload.
+              </p>
+            </div>
+
+            <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+              <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center font-extrabold text-sm">
+                02
+              </div>
+              <h3 className="text-base font-bold text-slate-900">Actionable Pulse</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Turn sentiment into measurable eNPS indicators. Real-time pulse analytics empower managers to resolve team bottlenecks proactively.
+              </p>
+            </div>
+
+            <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+              <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center font-extrabold text-sm">
+                03
+              </div>
+              <h3 className="text-base font-bold text-slate-900">Seamless Growth</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                From streamlined team assignments to automated PTO tracking and quarterly OKRs, we streamline your workforce operational engine.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Contact Section */}
+      <section id="contact" className="py-16 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[11px] font-extrabold rounded-full border border-indigo-200 uppercase">
+              Get in Touch
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              We're Here to Help Your Team Succeed
+            </h2>
+            <p className="text-xs sm:text-sm font-medium text-slate-600">
+              Have questions about TeamPulse or need assistance setting up enterprise workspaces? Reach out to our dedicated support team.
+            </p>
+          </div>
+
+          <div className="max-w-xl mx-auto bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Your Name</label>
+                <input
+                  type="text"
+                  placeholder="Jane Doe"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Work Email</label>
+                <input
+                  type="email"
+                  placeholder="jane@company.com"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Message</label>
+              <textarea
+                rows={3}
+                placeholder="How can we assist your organization?"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 resize-none"
+              ></textarea>
+            </div>
+            <button
+              type="button"
+              onClick={() => alert("Thank you for reaching out! A TeamPulse representative will be in touch shortly.")}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+            >
+              Send Message
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. Footer */}
       <footer className="mt-auto bg-white border-t border-slate-200 py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600">
           <div className="flex items-center gap-2">
