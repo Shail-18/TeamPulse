@@ -170,7 +170,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSuccess }) => {
               onClick={() => openAuth('signup')}
               className="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition-all flex items-center gap-1.5"
             >
-              Sign Up Free <ArrowRight className="w-3.5 h-3.5" />
+              Sign Up <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
